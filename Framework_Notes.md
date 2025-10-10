@@ -1,12 +1,12 @@
 ## ROS2
 - [ROS2 Docu](https://docs.ros.org/en/galactic/index.html)
 - architecture:  
-![alt text](image.png)
+![alt text](image\image1.png)
 1. Client Layer: 针对不同语言（C++/Python）提供对应API调用，底层Client Library为C实现
 2. DDS Layer: 中间层，解绑Client Layer与DDS Implementation Layer
 3. DDS Implementation Layer: 底层模块库，包括序列化，通信，传输等
 - Node: A node may publish data to any number of topics and simultaneously have subscriptions to any number of topics.  
-![alt text](image-1.png)
+![alt text](image\image2.png)
 - Topic: 
 - Sub/Pub Module: 
 - Task: a callback unit, can be execute by a Executor
@@ -31,6 +31,12 @@
 ### Paper
 - [ECRTS: Response-Time Analysis of ROS 2 Processing Chains Under Reservation-Based Scheduling](https://drops.dagstuhl.de/storage/00lipics/lipics-vol133-ecrts2019/LIPIcs.ECRTS.2019.6/LIPIcs.ECRTS.2019.6.pdf)
     - 针对ROS2 Executor scheduling
+- [RTSS: Real-Time Scheduling and Analysis of Processing Chains on Multi-threaded Executor in ROS 2](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9984791)
+    - 多线程 Executor 的时序分析与调度问题
+- [arxiv: Timing Analysis and Priority-driven Enhancements of ROS 2 Multi-threaded Executors](https://arxiv.org/pdf/2408.08440)
+    - 优先级调度在ROS2 Executor
+- [arxiv: Budget-based real-time Executor for micro-ROS](https://arxiv.org/pdf/2105.05590)
+    - 有budget要求，ROS2 Executor计算
 
 ## Self Driving Pipeline
 1. Perception
