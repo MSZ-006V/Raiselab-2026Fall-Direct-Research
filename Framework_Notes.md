@@ -35,6 +35,9 @@
     - 多线程 Executor 的时序分析与调度问题
 - [arxiv: Timing Analysis and Priority-driven Enhancements of ROS 2 Multi-threaded Executors](https://arxiv.org/pdf/2408.08440)
     - 优先级调度在ROS2 Executor
+    - 相关
+        1. Y. Tang, Z. Feng, N. Guan, X. Jiang, M. Lv, Q. Deng, and W. Yi, “Response time analysis and priority assignment of processing chains on ROS2 executors,” in IEEE Real-Time Systems Symposium (RTSS), 2020.
+        2. H. Choi, Y. Xiang, and H. Kim, “PiCAS: New design of priority-driven chain-aware scheduling for ROS2,” in IEEE Real-Time and Embedded Technology and Applications Symposium (RTAS), 2021
 - [arxiv: Budget-based real-time Executor for micro-ROS](https://arxiv.org/pdf/2105.05590)
     - 有budget要求，ROS2 Executor计算
 

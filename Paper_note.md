@@ -1,0 +1,28 @@
+## Timing Analysis and Priority-driven Enhancements of ROS 2 Multi-threaded Executors
+- 主要工作：提出了一个针对在ROS2多线程执行器上运行的链的响应时间分析（RTA）框架（基于优先级）
+    - RTA框架支持两种链：约束截止时间（constrained deadlines）和任意截止时间（arbitrary deadlines）
+    - 四种不同回调
+        - timer callbacks -> triggered when the timer period is up
+        - subscription callbacks -> triggered when a subscribed message arrives
+        - service and client callbacks -> triggered by a service request and a response to a service request
+    - callbacks之间存在固有的优先级顺序：1. timer callbacks 2. subscription callbacks 3. service and client callbacks (对于相同类型的回调，其优先级由它们在节点中的声明顺序隐式决定)
+    - Processing Chain (Chain): A set of callbacks with data dependencies forms a processing chain, each callback can be associated with one or more chains, and chains can be formed by callbacks from different nodes
+    - **Executor**: Each executor maintains a **ReadySet**, **ReadySet** only updated when it is empty
+    - **Polling Point**: The time update **ReadySet**
+    - **Processing Window**: The time interval between two consecutive polling points is called a processing window
+    - Issue: 
+        - **Priority Inversion**: 在一个轮询点之后释放的回调函数，直到下一个轮询点才会被处理
+        - **Blocking**: 如果同一回调函数存在多个待处理实例，则一个回调实例在获得调度之前可能会被阻塞多个处理窗口
+    - 新定义：旧的ReadySet定义和Polling Point不适用于新的Multi Thread Executor, 因此定义新的概念
+        - ReadySet：至少有一个线程变为空闲的时间点
+        - Polling Point: 两个连续轮询点之间的时间间隔，无论是由哪个线程触发了新的轮询点
+    - Demand Bound Function(DBF): 任务需要多少资源
+    - Supply-Bound Function(SBF)：系统能提供多少资源
+    - Core algorithm
+        - **Priority-drive schedule**: 修改Executor代码，
+        - **Callback priority management**: use the method proposed in [3] H. Choi, Y. Xiang, and H. Kim, “PiCAS: New design of priority-driven chain-aware scheduling for ROS2,” in IEEE Real-Time and Embedded Technology and Applications Symposium (RTAS), 2021
+## Budget-based real-time Executor for micro-ROS（不符合场景）
+- Sporadic Scheduler
+    - 参数：budget, a replenishment period(补充周期), a normal priority, a low priority and the maximum number of replenishments.
+    - 特点：当任务消耗完budget会，会降低自身的优先级，直到补充budget后，因此这种方法不能保证每个线程能在固定的budget内执行完毕，只确保线程消耗不超过其分配的预算
+    - 存在budget耗尽的情况：如果耗尽，会有不同的处理策略（比如补满budget，或者是降低优先级）
