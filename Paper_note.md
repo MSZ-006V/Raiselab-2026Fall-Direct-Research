@@ -26,3 +26,12 @@
     - 参数：budget, a replenishment period(补充周期), a normal priority, a low priority and the maximum number of replenishments.
     - 特点：当任务消耗完budget会，会降低自身的优先级，直到补充budget后，因此这种方法不能保证每个线程能在固定的budget内执行完毕，只确保线程消耗不超过其分配的预算
     - 存在budget耗尽的情况：如果耗尽，会有不同的处理策略（比如补满budget，或者是降低优先级）
+## PiCAS: New Design of Priority-Driven  Chain-Aware Scheduling for ROS2
+- end to end, priority driven chain-aware scheduler
+- 背景：多核，链（即多个任务之间有依赖），基于链的关键性和时序性要求优先执行
+    - Chain: A chain is a semantic abstraction defined by message exchanges between callbacks of one or more nodes.
+        - 对于一个chain model，可以假设第一个callback是一个timer，后续都是regular
+- 策略：
+    1. 单Executor情况下：逆序优先级分配：比如链链 Γc = [τ1 (感知), τ2 (规划), τ3 (控制)]，正确的优先级分配是τ3 > τ2 > τ1
+    2. 多Executor（across）：分为单CPU的单链和多CPU的多链
+- 分配算法：分层；首先考虑链之间的优先级，再到链内部考虑优先级 

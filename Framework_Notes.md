@@ -38,8 +38,11 @@
     - 相关
         1. Y. Tang, Z. Feng, N. Guan, X. Jiang, M. Lv, Q. Deng, and W. Yi, “Response time analysis and priority assignment of processing chains on ROS2 executors,” in IEEE Real-Time Systems Symposium (RTSS), 2020.
         2. H. Choi, Y. Xiang, and H. Kim, “PiCAS: New design of priority-driven chain-aware scheduling for ROS2,” in IEEE Real-Time and Embedded Technology and Applications Symposium (RTAS), 2021
+            - 代码仓库：https://github.com/rtenlab/ros2-picas
+            - 参考：Linux CBS (Constant Bandwidth Server)
 - [arxiv: Budget-based real-time Executor for micro-ROS](https://arxiv.org/pdf/2105.05590)
     - 有budget要求，ROS2 Executor计算
+
 
 ## Self Driving Pipeline
 1. Perception
