@@ -24,3 +24,4 @@
     ./build/picas_example/example   # single-threaded version
     ./build/picas_example_mt/example_mt   # multi-threaded version
     ```
+4. 编写新的类后，在src/rclcpp中编写cpp文件，在include/rclcpp编写hpp文件，随后修改CMakeList注册新的模块

@@ -18,4 +18,4 @@
     - 阅读ROS2的default执行器（可能是FIFO的）和魔改版本
 2. 出发点：首先在满足第三点（即通过tradeoff QoS和ACC，保证任务在budget内执行完成）的基础上，考虑抢占或者异构核执行
 3. 了解self driving pipeline(perception, localization, planning等)
-
+4. Linux LST (Least slack time scheduling): Least slack time (LST) scheduling or least laxity first is an algorithm for dynamic priority scheduling. [wiki](https://en.wikipedia.org/wiki/Least_slack_time_scheduling)
