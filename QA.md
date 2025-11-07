@@ -21,6 +21,7 @@
     ```
     source install/setup.bash
     
+    ./build/picas_example/sstest   # 新编写的
     ./build/picas_example/example   # single-threaded version
     ./build/picas_example_mt/example_mt   # multi-threaded version
     ```

@@ -13,4 +13,12 @@
 - executor：single_threaded_executor, multi_threaded_executor
 - strategies: allocator_memory_strategy
 - 可以在ros2-picas-example/picas_example/src/example.cpp里面，比如设置5个不同的任务，然后根据budget来智能计算一个优先级
-    - 
+- 记得拍照啊！
+- 计算公式修改了，slack time = ci - (cur - timestamp)
+- 任务属性
+    - 当前时刻: t_cur
+    - 任务DDL: Di
+    - 剩余执行时间：Ci
+    - slack time = Di - t_cur - Ci
+    - 由slack time来决定Priority and Execution Version
+- 看一下node类
