@@ -23,22 +23,15 @@
 
 ## QoS计算框架
 - QoS评价指标：throughtput，latency，accuracy
-- 对于整个系统
-    - $$deadline\ miss\ rate = \frac{missed\ deadlines\ tasks}{total\ tasks}（百分比形式）$$
-        - 和latency有关，latency分为三类：network latency, scheduling latency, execution latency
-        - network latency与网络环境有关
-        - scheduling latency与scheduler有关，即整个调度框架有关
-        - execution latency与任务version有关，与accuracy有关
-        - 总指标，代表总任务数，与时间无关
-    - $$throughtput = min(1, \frac{T_{cur}}{A_{cur}})$$
+- 对于整个系统（in time window 100ms）
+    - throughtput
+        $$throughtput = min(1, \frac{T_{cur}}{A_{cur}})$$
         - T_cur: 在time_window内完成的所有任务（包括miss deadline和no miss deadline）
         - A_cur：在时间窗口内到达的任务
         - time_window: 统计窗口（1s）
         - 范围：0 - 1
-    - Accuray（系统级,在一个时间）(也可以转换为根据不同类型的任务，拥有不同的权重)
-$$
-Acc_{sys} = \frac{1}{N}\sum^{N}_{i = 1}acc(\tau_i)
-$$
+    - data freshness: 在当前这个time window内完成的所有chain的data freshness的加权组合
+    - $$QoS（系统级）= w_{th}Q_{th} + w_{df}Q_{df}$$
 - 对于单个任务
     - 参数：Di(deadline), Ai(arrival time), Ci(execution time), Fi(finish time)
     - accuracy：分为两种 deadline accuracy，temporal accuracy
@@ -46,10 +39,24 @@ $$
         - temporal accuracy: acc_t = max(0, 1 - (Fi - Ai) / (Di - Ai))
             - Fi越靠近Di，acc_t越低；Fi理Di越远，acc_t越大
             - 区间 0 <= acc_t <= 1
-$$
-acc_t(\tau_i) = \lambda*acc_d(i) + (1 - \lambda)*acc_t(i)
-$$
-- $$QoS（系统级）= w_{acc}Q_{acc} + w_{lat}Q_{lat} + w_{th}Q_{th}$$
+        $$
+        acc_t(\tau_i) = \lambda*acc_d(i) + (1 - \lambda)*acc_t(i)
+        $$
+- 对于一条链（chain）
+    - Accuray（系统级,在一个时间）(也可以转换为根据不同类型的任务，拥有不同的权重)
+    $$
+    Acc_{sys} = \frac{1}{N}\sum^{N}_{i = 1}acc(\tau_i)
+    $$
+    - data freshness
+    $$
+    Data\ Freshness = min(1, 1-\frac{lag}{lag_{max}}) \\
+    lag = t_{comple} - t_{first} \\ 
+    lag_{max} = P_{max} + L_{net} + L_{exec} + L_{queue} + \epsilon \\
+    P_{max} = 链中task最长period \\
+    L_{net} = avg 网络延迟 \\
+    L_{exec} = avg 执行时间 \\
+    L_{queue} = avg scheduling pending
+    $$
 - todo
     - slack time与priority的关系（1 - 99）
         - 由Di与expect_execution关系得出
@@ -57,3 +64,11 @@ $$
         - 否则在1-98的范围
     - 如何考虑data freshness
     - 如何根据slack time选择版本？
+- 修改点
+    - 去掉sys acc，deadline miss rate
+    - 保留单个用来评价job的acc，sys的throughput使用原来的
+    - qos可以由throughput组成，也可以由data freshness组成
+    - throughput也可以用时间窗口内完成了多少个链组成
+    - 考虑链的计算问题
+        - qos由链data freshness，这段时间内的throughput组成（统计一条链）
+        - data freshness看看别人怎么定义
