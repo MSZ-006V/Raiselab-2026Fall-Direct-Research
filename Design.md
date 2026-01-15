@@ -52,23 +52,8 @@
     Data\ Freshness = min(1, 1-\frac{lag}{lag_{max}}) \\
     lag = t_{comple} - t_{first} \\ 
     lag_{max} = P_{max} + L_{net} + L_{exec} + L_{queue} + \epsilon \\
-    P_{max} = 链中task最长period \\
-    L_{net} = avg 网络延迟 \\
-    L_{exec} = avg 执行时间 \\
-    L_{queue} = avg scheduling pending
+    P_{max} = 最长period \\
+    L_{net} = avg\ 网络延迟 \\
+    L_{exec} = avg\ 执行时间 \\
+    L_{queue} = avg\ scheduling\ pending
     $$
-- todo
-    - slack time与priority的关系（1 - 99）
-        - 由Di与expect_execution关系得出
-        - 若以必定miss deadline，则99
-        - 否则在1-98的范围
-    - 如何考虑data freshness
-    - 如何根据slack time选择版本？
-- 修改点
-    - 去掉sys acc，deadline miss rate
-    - 保留单个用来评价job的acc，sys的throughput使用原来的
-    - qos可以由throughput组成，也可以由data freshness组成
-    - throughput也可以用时间窗口内完成了多少个链组成
-    - 考虑链的计算问题
-        - qos由链data freshness，这段时间内的throughput组成（统计一条链）
-        - data freshness看看别人怎么定义

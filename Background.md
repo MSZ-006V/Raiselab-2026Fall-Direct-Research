@@ -19,3 +19,26 @@
 2. 出发点：首先在满足第三点（即通过tradeoff QoS和ACC，保证任务在budget内执行完成）的基础上，考虑抢占或者异构核执行
 3. 了解self driving pipeline(perception, localization, planning等)
 4. Linux LST (Least slack time scheduling): Least slack time (LST) scheduling or least laxity first is an algorithm for dynamic priority scheduling. [wiki](https://en.wikipedia.org/wiki/Least_slack_time_scheduling)
+
+## 2026 Spring Research Plan
+- 需要做一个slide！！！
+
+- 关键词：Crowd Computing, Mobile Crowd Computing
+- 定义：利用用户终端（手机，IoT）的闲置CPU，通过任务拆分，把计算下发到终端执行
+- 终端是计算节点，节点不可信，需要随时离线
+- 经典问题：任务调度（task placement），容错 & Checkpoint
+
+### 任务拆分
+- 常见的任务拆分模型：data parallel（拆数据，计算逻辑相同。问题是数据分布不均，节点算力差距），task graph、DAG（拆分为多个子任务，存在依赖关系。经典问题如DAG Scheduling NP-hard，节点掉线=DAG断裂），pipeline/Streaming（任务是连续流，每个节点处理一个阶段，问题就是单点瓶颈
+
+1. 一个例子
+- 分布式图像特征提取
+- 如10万张图片，拆分为每个task处理1000张（无状态，独立执行）
+- 分为Split，Placement, Execution, Aggregation
+
+### 架构相关
+1. Ray Architecture
+
+2. KubeEdge(k8s extension)
+
+3. BOINC(volunteer Computing)
