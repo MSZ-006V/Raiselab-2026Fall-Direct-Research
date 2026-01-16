@@ -22,6 +22,10 @@
 
 ## 2026 Spring Research Plan
 - 需要做一个slide！！！
+    - 介绍一下分布式计算流程
+    - 目前分布式计算框架（任务调度框架）的问题：straggler，churn, trust
+    - 相关的框架，优缺点，可能可以优化的工程细节
+    - 
 
 - 关键词：Crowd Computing, Mobile Crowd Computing
 - 定义：利用用户终端（手机，IoT）的闲置CPU，通过任务拆分，把计算下发到终端执行
@@ -32,13 +36,46 @@
 - 常见的任务拆分模型：data parallel（拆数据，计算逻辑相同。问题是数据分布不均，节点算力差距），task graph、DAG（拆分为多个子任务，存在依赖关系。经典问题如DAG Scheduling NP-hard，节点掉线=DAG断裂），pipeline/Streaming（任务是连续流，每个节点处理一个阶段，问题就是单点瓶颈
 
 1. 一个例子
-- 分布式图像特征提取
-- 如10万张图片，拆分为每个task处理1000张（无状态，独立执行）
+- 分布式图像特征提取- 如10万张图片，拆分为每个task处理1000张（无状态，独立执行）
 - 分为Split，Placement, Execution, Aggregation
+- 待解决问题：straggler（低端手机拖慢整体进度），Churn（节点随时消失），Energy，Trust，Overhead等
+
+### 待解决问题
+- straggler：执行链中被少数执行特别慢的task拖慢
+- churn：节点下线（比如频繁加入，离开，容易造成task丢失和DAG断裂）
+- energy：
+- trust：edge device的计算是否可信（恶意节点？软件被篡改，伪造）
+- overhead：系统开销（比如调度+通信+状态维护成本加起来比计算成本还大）
 
 ### 架构相关
-1. Ray Architecture
+1. Ray Architecture: task-based distributed runtime
+- 可以实现runtime自动拆分task，调度，传输数据等
+- 问题：心跳开销大，node churn崩溃（GCS强依赖，什么是GCS？）worker太重（Python，什么意思？）
+- 改进idea：针对ray architecture在edge/mobile下的性能问题，做出一些改进    
+- scheduler改造：加node volatility model，battery-aware placement（实验 churn vs completion time）    
+- control plane精简：替代GCS的强一致依赖，使用更弱的membership model    
+- task granularity：自适应 task size（比如根据device的性能），或者是小task + speculative execution- 实验细节    
+- 可以随机kill，使用bandwidth cap，或者是energe budget    
+- ray archi使用python
 
 2. KubeEdge(k8s extension)
+- 不适合手机，假设节点长期在线，需要container+kubelet，基础设施比较沉重
 
 3. BOINC(volunteer Computing)
+- 比较老的架构，特点是节点不可靠，支持checkpoint，支持replication。但是会有高延迟，批处理等缺点
+```
+Central Server  |Scheduler  |Clients (volunteers)
+```
+
+- DAG(directed acyclic graph): 有向无环图，用于表达一个任务链
+
+## Ray Archi
+- 关键词：高性能计算，支持python，pandas，numpy，分布式异步调用，内存调度，加速机器学习
+- Dask：也是python分布式数据平台，底层是分布式计算架构
+
+## idea
+- 针对straggler问题，能不能根据设备的算力，动态的调节任务的大小（或者是多个client分配到的任务规模不一样）
+
+## docu
+- Ray: A Distributed Framework for Emerging AI Applications
+- Hoplite: Efficient and Fault-Tolerant Collective Communication for Task-Based Distributed Systems
