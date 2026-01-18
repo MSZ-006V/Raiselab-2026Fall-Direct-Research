@@ -42,3 +42,9 @@
 2. KubeEdge(k8s extension)
 
 3. BOINC(volunteer Computing)
+
+是否是node-aware，任务分配是什么逻辑，任务调度是什么逻辑
+1. node fail，是否可以设置一个bound时间，如果超时就重新分配，
+2. increase fault-tolerance，add bound time，node recovery
+- 看一下做什么方向，然后再详细的介绍一下
+在high level的下面，增加什么，跟tool关系不大
