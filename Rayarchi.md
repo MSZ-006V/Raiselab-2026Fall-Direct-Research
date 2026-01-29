@@ -13,6 +13,10 @@
     - RLlib：RL相关
 ## Ray Core
 - 构建和运行分布式应用程序的组件，可以将Python或Java函数和类转换为分布式无状态任务或有状态Actor
+- 支持传递参数，对象（存储在object_store中）
+- task：允许函数在不同的工作进程上异步执行，这些异步Ray函数就是task
+- actor（actor模型）：支持类，Actor 本质上是一个有状态的工作进程（或服务）
+- 对象objects：ray会把object存储在集群的任何位置（分布式共享内存 object store）
 
 ## RayKube - Ray k8s extension
 - K8s相关插件（KubeRay）
@@ -29,3 +33,12 @@
 - Ray头节点（Head Node）：头节点与其他的工作节点系统，但是还运行负责集群管理的单例进程（Autoscaler，GCS，Ray driver processes）
 - Ray工作节点（Worker Node）：工作节点不允许任何头节点管理进程，只运行Ray任务和Actor中的用户代码
 - Autoscaler（自动扩缩容）：运行在主Pod的sidecar模式，自动扩缩容机制仅响应任务和 Actor 的资源请求，而不响应应用程序指标或物理资源利用率
+
+1. 看Ray，怎么优化，有没有人做相关的插件，有什么研究的点
+2. 看有没有相关的论文，描述这方面的设计
+3. 总之就是看ray的bottleneck在哪, 然后如何下手进行研究
+- 架构视角，组件怎么分工，谁控制谁
+- 执行路径视角：一次task/actor调度，从提交到执行经过了什么
+- bottleneck怎么找：时间，通信，内存，调度决策
+
+q1：ray的分布式内存，怎么保证调度的快速性
