@@ -20,7 +20,12 @@
 - 相关CRD：RayCluster，RayJob，RayService
 1. Ray Cluster
 2. Ray Job
+   - 独立的应用程序，包含来源自同一脚本的Ray任务，对象和Actor的集合
 3. Ray Service
+   - 
 
 ## Concepts
 - Ray支持将计算任务从单机串行执行扩展到分布式异步执行。比如借助远程API（remote API），可以将计算任务提交到计算集群，动态的将任务拆分成更细粒度的计算任务，然后并行执行任务，异步的收集计算结果
+- Ray头节点（Head Node）：头节点与其他的工作节点系统，但是还运行负责集群管理的单例进程（Autoscaler，GCS，Ray driver processes）
+- Ray工作节点（Worker Node）：工作节点不允许任何头节点管理进程，只运行Ray任务和Actor中的用户代码
+- Autoscaler（自动扩缩容）：运行在主Pod的sidecar模式，自动扩缩容机制仅响应任务和 Actor 的资源请求，而不响应应用程序指标或物理资源利用率
