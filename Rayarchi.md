@@ -89,3 +89,11 @@ q1：ray的分布式内存，怎么保证调度的快速性
     - 是否可以自定义一个调度策略，支持hard ddl呢
     - 但是Ray因为架构原因，task和actor都无法支持抢占
 4. Ray的actor churn问题：假设Actor被频繁创建然后又销毁
+
+idea:
+1. 可以2，4：waiting time bound，先再了解一下SPREAD的具体逻辑（和default的区别，是不是会完全为了load-balancing而服务，而不管任务的具体情况）
+2. 第四点可以考虑ddl aware，不做hard ddl，可以尽量做成soft ddl
+3. 像任务打包的时候附带的参数（比如num_cpu一样，携带一部分的参数）
+4. 了解SPREAD的逻辑，查看如何修改代码
+5. 需要跑preliminary的实验
+6. 每一个node里面，任务队列是什么，执行的顺序是什么？我可以修改任务执行的顺序吗
