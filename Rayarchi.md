@@ -85,16 +85,104 @@ q1：ray的分布式内存，怎么保证调度的快速性
        - Locality-Aware Scheduling（Only for task）：优先选择在本地拥有大量任务参数的节点，此优先级高于DEFAULT策略
 2. SPREAD会牺牲部分data locality，是否可以综合他们来进行调度？
     - score = α * load_balance + β * data_locality
-3. Ray是一个soft ddl系统，在面对hard ddl任务的时候，有什么保证吗
-    - 是否可以自定义一个调度策略，支持hard ddl呢
-    - 但是Ray因为架构原因，task和actor都无法支持抢占
 4. Ray的actor churn问题：假设Actor被频繁创建然后又销毁
 
 idea:
 1. 可以2，4：waiting time bound，先再了解一下SPREAD的具体逻辑（和default的区别，是不是会完全为了load-balancing而服务，而不管任务的具体情况）
-2. 第四点可以考虑ddl aware，不做hard ddl，可以尽量做成soft ddl
+2. 第四点可以考虑ddl aware，不做hard ddl，可以尽量做成soft ddl（针对task）
 3. 像任务打包的时候附带的参数（比如num_cpu一样，携带一部分的参数）
 4. 了解SPREAD的逻辑，查看如何修改代码
 5. 需要跑preliminary的实验
 6. 每一个node里面，任务队列是什么，执行的顺序是什么？我可以修改任务执行的顺序吗
-7. 
+7. 任务所需资源不够的情况下（task或actor）
+  - 默认：无限等待pending
+  - method1：
+    - task：设置一个max_retry=3, 等待时间指数上升
+    - actor：尝试对node上的actor进行迁移，腾出足够空间容纳新的actor
+    ```
+    network layer
+
+    actor3 25%
+    node1: actor1 70%, actor2 20%
+    node2: actor4 80%
+
+    actor2 (node1 -> node2)
+
+    node1: actor1 70%, 
+    node2: actor4 80%, actor2 20%
+    ```
+  - method2:
+    - task, actor max_retry = 3, 等待时间指数上升
+    - max_retry, timeout = 3s
+
+1. Default: 尽量把任务“挤”到已有节点上，减少节点扩散，提高局部性。按优先级进行排序（资源局部性，减少跨节点对象传输，提高Cache/Object reuse, 减少节点冷启动和Actor分散
+  - 步骤：1. 过滤出满足资源需求的节点 2. 优先选择：已经运行同类task的节点，资源刚好够用的节点，数据本地性高的节点 3. 选择第一个节点
+  - 问题：不会主动均匀分布！
+2. Spread：刻意把任务分散到不同节点上，最大化节点级并行
+  - 步骤：1. 过滤出满足资源需求的节点 2. 优先选择当前任务数最少的节点, 尽量选择“还没跑过这个 task / actor 的节点” 
+  - 忽略data locality
+
+node1 -> 2 cpu, 1 gpu ---> 不停
+node2 -> 16 cpu, 8 gpu
+
+3. 若没有足够资源，任务会处于pending（等待资源）的状态，不会拆分任务，ray会假设这是一个暂时的资源短缺问题，会不断重试调度（无限等待）
+4. task & actor
+  - task：无限并行，无状态，一次性任务，纯函数式的计算请求
+    - task失败只需要分配到其他节点重试即可
+    ```
+    func(int a, int b): return a + b;
+    ```
+  - actor：带状态、长期存在的计算实体，所有对它的调用都是单线程串行执行
+    - actor失败需要ray处理状态丢失，重建等问题
+    ```
+    class counter
+      private cnt;
+      add{
+        cnt++;
+      }
+
+    node1.add()
+
+    node3.add()
+
+    // 读取cnt = 2；
+    ```
+- 
+
+5. 相关文件
+- ray/src/ray/raylet/scheduling/scheduling_policy.cc
+- ray/src/ray/raylet/scheduling/cluster_resource_scheduler.cc
+- ray/src/ray/raylet/scheduling/locality_aware_scheduling.cc
+
+6. next week plan：
+  - 跑preliminary的实验
+  - 先把修改raylet的层面跑通
+
+```
+# script.py
+import ray
+
+@ray.remote
+def hello_world():
+    [cpu=1, gpu=2, waiting_timeout=4]
+    return "hello world"
+
+# Automatically connect to the running Ray cluster.
+ray.init()
+print(ray.get(hello_world.remote()))
+```
+
+（可行性）
+- high prior：不想被network阻塞，做一个high prior queue，对于特定object，
+  - send 之前有一个队列，变成一个priority queue
+  - object transmission
+  - Node1: queue: a, b, c, d -> d, a, b, c
+- Node interconnection
+  - find which channel(default is gRPC?)
+  - high priority gRPC channel, best-effort gRPC channel
+  - gRPC 是否long-live
+
+- benchmark test
+  - envir：小data
+  - light workload
+  - heavy workload，stress test，
