@@ -6,15 +6,18 @@
 3. memory_aware(locality), workload_aware(任务), priority_aware
 ```
 
+priority_queue
+位置：src/ray/object_manager/push_manager.cc/ScheduleRemainingPushes()
+作用场景：当node1上的task要执行时，发现需求的某个大对象不存在本地，触发了raylet调度，该请求通过本地节点的raylet传到了另外一个节点的raylet（假设node2），node2的节点通过读取本地的object store，得到对象，通过push_manager发回
+push_manager发送原理：对于大对象，切分为chunk进行发送，原生使用round_robin方法
+想要实现的效果：在push_manager发回时，通过透传的某个优先级，优先把对应任务需要的对象先发回（非抢占）
+实现步骤
+1. 一路透传从Python层面（在定义task的时候，传入一个参数）
+2. 该参数伴随着raylet请求从node1传送到node2，node2获取对象后，给push_manager进行发送
+3. 那么目前push_manager内会有多个等待发送的大对象，根据不同对象对应任务的优先级，按照优先级从高到低进行发送
 
+初步实现
+1. 首先修改ScheduleRemainingPushes()内，修改round_robin算法为SJF算法（即按照对象切分后的chunk数量）进行选择下一个要发送的对象（按照越小的对象发送优先级越高进行决定）
+2. 修改后，重新编译，启动
 
-
-4. - big pic：大的workload（可能需要拆分）
-5. 在multitask envir，
-- 目前：第一步首先完成fix priority
-- 第二步：memory priority，workload——aware，或者说对于某个对象所属于的task，是否在某个chain里面，然后可以怎么保证
-- 其实就是把ray做成一个类似ros的东西
-- 最终实现
-\
-- 下周目前：画图，分为high p，median p，low p，画图，对比fixed prior和default的东西
-- 
+1. 如何编写对应的benchmark实验?
